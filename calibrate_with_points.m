@@ -32,25 +32,34 @@ H = 1000;
 c = 1;
 a = 5;
 
-for i = 1:500
-    f = sum((a * (1 - d ./ H).^4 + c - nu).^2);
-    
-    ff = a * (1 - d ./ H).^4 + c - nu;
-    
-    da = sum(2 .* ff .* (1 - d ./ H).^4);
-    dc = sum(2 * ff);
-    dh = sum(2 .* ff .* 4 .* a .* (1 - d ./ H).^3 .* (d / H^2));
-    
-    
-    fprintf("%f, %f, %f, Error: %f \n", a, c, H, f);
-    k = 0.1;
-    a = a - k * da;
-    %c = c - k * dc;
-    H = H - k * 10000 * dh;
-    
-end
+
+objective = @(v) fit_func(d, dominant, [v(1), 1, v(2)]);
+res = fminsearch(objective, [1000, 5]);
+disp(res);
 
 
-plot(mls, nu);
-hold on;
-plot(mls, a * (1 - d ./ H).^4 + c);
+% for i = 1:500
+%     f = sum((a * (1 - d ./ H).^4 + c - nu).^2);
+%     
+%     ff = a * (1 - d ./ H).^4 + c - nu;
+%     
+%     da = sum(2 .* ff .* (1 - d ./ H).^4);
+%     dc = sum(2 * ff);
+%     dh = sum(2 .* ff .* 4 .* a .* (1 - d ./ H).^3 .* (d / H^2));
+%     
+%     
+%     fprintf("%f, %f, %f, Error: %f \n", a, c, H, f);
+%     if i < 100
+%         k = 0.2;
+%     else
+%         k = 1 / i;
+%     end
+%     a = a - k * da;
+%     H = H - k * 10000 * dh;
+%     
+% end
+
+
+% plot(mls, nu);
+% hold on;
+% plot(mls, a * (1 - d ./ H).^4 + c);
