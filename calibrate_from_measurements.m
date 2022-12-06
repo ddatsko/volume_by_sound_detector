@@ -9,4 +9,3 @@ function X = calibrate_from_measurements(freq, volume, full_volume)
     objective = @(v) fit_func(d, freq, [v(1), 1, v(2)]);
     X = fminsearch(objective, [H_init, a_init]);
 end
-    

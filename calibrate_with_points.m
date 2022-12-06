@@ -33,9 +33,16 @@ c = 1;
 a = 5;
 
 
-objective = @(v) fit_func(d, dominant, [v(1), 1, v(2)]);
-res = fminsearch(objective, [1000, 5]);
+objective = @(v) fit_func(d, dominant, [v(1), v(2), v(3)]);
+res = fminsearch(objective, [1000, 1, 5]);
 disp(res);
+
+H = res(1);
+c = res(2);
+a = res(3);
+
+
+
 
 
 % for i = 1:500
