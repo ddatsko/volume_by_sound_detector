@@ -1,4 +1,4 @@
-function squares_sum = fit_func(d, freq, v)
+function squares_sum = method_1_loss(d, freq, v)
     nu = (freq(1) ./ freq).^2;
     H = v(1);
     c = v(2);

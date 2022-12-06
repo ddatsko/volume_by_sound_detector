@@ -25,23 +25,33 @@ end
 
 mls = [0, 100, 200, 300, 400, 470];
 
-nu = (dominant(1) ./ dominant).^2;
-d = 500 - mls;
-
-H = 1000;
-c = 1;
-a = 5;
+calibration = calibrate_from_measurements(dominant(1:3), mls(1:3), 500);
 
 
-objective = @(v) fit_func(d, dominant, [v(1), v(2), v(3)]);
-res = fminsearch(objective, [1000, 1, 5]);
-disp(res);
+% objective = @(v) fit_func(d, dominant, [v(1), v(2), v(3)]);
+% res = fminsearch(objective, [1000, 1, 5]);
+% disp(res);
 
-H = res(1);
-c = res(2);
-a = res(3);
+% H = res(1);
+% c = res(2);
+% a = res(3);
 
 
+% y = log(nu - 1);
+% x = log(mls / 500);
+% 
+% 
+% al = 5;
+% c = 1;
+% scatter(mls, nu);
+% hold on;
+% scatter(mls, c + al * (mls / 500).^4);
+% % t = 50:1:500;
+
+% plot(t,  (0.003*t).^3 + 1);
+
+% al = 1;
+% scatter(nu, 1 + al * ((mls / 500).^4));
 
 
 
