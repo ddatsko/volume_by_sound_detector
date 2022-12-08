@@ -1,11 +1,12 @@
 
 % Go through each file in the directory
-directory = '/home/mrs/records';
+directory = '/home/mrs/records/set2';
 files = dir(fullfile(directory,'*.wav'));
 
 dominant = zeros([1, length(files)]);
 
 
+mls = [];
 
 for i = 1:length(files)
   filename = files(i).name;
@@ -20,12 +21,13 @@ for i = 1:length(files)
   
   [argvalue, argmax] = max(ft(1:length(ft) / 2));
   dominant(i) = freq(argmax);
-
+  
+  % Get the amount of water from file name in format "<number>mls.wav"
+  [s, e] = regexp(filename, '(\d+)');
+  mls = [mls, str2num(filename(s:e))];
 end
 
-mls = [0, 100, 200, 300, 400, 470];
 
-calibration = calibrate_from_measurements(dominant(1:3), mls(1:3), 500);
 
 
 % objective = @(v) fit_func(d, dominant, [v(1), v(2), v(3)]);
@@ -37,13 +39,57 @@ calibration = calibrate_from_measurements(dominant(1:3), mls(1:3), 500);
 % a = res(3);
 
 
-% y = log(nu - 1);
-% x = log(mls / 500);
-% 
-% 
-% al = 5;
-% c = 1;
-% scatter(mls, nu);
+% Sort by frequency
+tmp = [mls; dominant];
+tmp = sortrows(tmp.',1).';
+mls = tmp(1, :);
+dominant = tmp(2, :);
+
+mls_for_calib = [0, 40, 60, 80, 300, 350];
+% mls_for_calib = mls;
+dominant_for_calib = mls == mls_for_calib(1);
+for i = mls_for_calib
+    dominant_for_calib = dominant_for_calib | (mls == i);
+end
+
+
+calibration = calibrate_from_measurements(dominant(dominant_for_calib), mls_for_calib, 500);
+
+objective = @(v) method_3_loss(dominant(dominant_for_calib), 11, mls_for_calib, v);
+method_3 = fminsearch(objective, [3.8, 2, 5, 0.1, 0.1]);
+
+
+scatter(mls, dominant);
+
+
+
+
+
+
+
+mls1_pred = [];
+mls2_pred = [];
+mls3_pred = [];
+for freq = 250:590
+   [m1, m2] =  predict(calibration, freq, 589.439, 500, 1);
+   mls2_pred = [mls2_pred, m2];
+   if imag(m1) == 0
+       mls1_pred = [mls1_pred, m1];
+   else
+       mls1_pred = [mls1_pred, 0];
+   end
+
+   mls3_pred = [mls3_pred, m3];
+
+end
+
+hold on;
+plot(mls3_pred, 250:590, 'r');
+plot(mls2_pred, 250:590, 'b');
+
+
+
+
 % hold on;
 % scatter(mls, c + al * (mls / 500).^4);
 % % t = 50:1:500;

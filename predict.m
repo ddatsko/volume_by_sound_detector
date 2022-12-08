@@ -26,9 +26,9 @@ function [dom_frequency, volume] = predict(X, freq, empty_freq, glass_volume, am
     alpha_2 = X(5);
     
     method_2_prediction = glass_volume * ((nu - 1) / alpha_2)^0.25;
-    method_1_prediction =  glass_volume + H_1 * (((nu - c_1) / a_1) ^ 0.25 - 1);
+    method_1_prediction = glass_volume + H_1 * (((nu - c_1) / a_1) ^ 0.25 - 1);
     
-    dom_frequency = method_2_prediction;
-    volume = method_1_prediction;
+    dom_frequency = method_1_prediction;
+    volume = method_2_prediction;
     
 end
