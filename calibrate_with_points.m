@@ -37,7 +37,7 @@ end
 % H = res(1);
 % c = res(2);
 % a = res(3);
-
+  
 
 % Sort by frequency
 tmp = [mls; dominant];
@@ -45,7 +45,7 @@ tmp = sortrows(tmp.',1).';
 mls = tmp(1, :);
 dominant = tmp(2, :);
 
-mls_for_calib = [0, 40, 60, 80, 300, 350];
+mls_for_calib = [0, 200, 300];
 % mls_for_calib = mls;
 dominant_for_calib = mls == mls_for_calib(1);
 for i = mls_for_calib
@@ -53,10 +53,10 @@ for i = mls_for_calib
 end
 
 
-calibration = calibrate_from_measurements(dominant(dominant_for_calib), mls_for_calib, 500);
+calibration = calibrate_from_measurements(dominant(dominant_for_calib), mls_for_calib, 500, 11, [4, 1, nan, nan]);
 
-objective = @(v) method_3_loss(dominant(dominant_for_calib), 11, mls_for_calib, v);
-method_3 = fminsearch(objective, [3.8, 2, 5, 0.1, 0.1]);
+% objective = @(v) method_3_loss(dominant(dominant_for_calib), 11, mls_for_calib, v);
+% method_3 = fminsearch(objective, [3.8, 2, 5, 0.1, 0.1]);
 
 
 scatter(mls, dominant);
@@ -65,20 +65,12 @@ scatter(mls, dominant);
 
 
 
-
-
-mls1_pred = [];
 mls2_pred = [];
 mls3_pred = [];
 for freq = 250:590
-   [m1, m2] =  predict(calibration, freq, 589.439, 500, 1);
-   mls2_pred = [mls2_pred, m2];
-   if imag(m1) == 0
-       mls1_pred = [mls1_pred, m1];
-   else
-       mls1_pred = [mls1_pred, 0];
-   end
+   [~, m2, m3] =  predict(calibration, freq, 1);
 
+   mls2_pred = [mls2_pred, m2];
    mls3_pred = [mls3_pred, m3];
 
 end

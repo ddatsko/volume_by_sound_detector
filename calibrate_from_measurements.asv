@@ -16,8 +16,6 @@ function X = calibrate_from_measurements(freq, volume, full_volume, glass_height
           - frequency on 0 volume
           - a for method 1
           - a, b1, C, phi1, phi2 for method 3
-          - glass volume
-          - glass height
 
         method_3_defaults:
           - Values for method 3 calibration that should not be estimated
@@ -28,19 +26,9 @@ function X = calibrate_from_measurements(freq, volume, full_volume, glass_height
       
     %}
     % Set the first element of X to number of calibration points
-    
-    % TODO: Sor freq and volume by frequency before doing this!!!
     n_points = length(freq);
-    X = [n_points, freq(1)];
+    X = [n_points];
     
-    disp("Calibrating from measurements: ");
-    disp(freq);
-    disp(volume);
-    
-    
-    disp("Calibration: ");
-    disp(freq);
-    disp(volume);
     
     % Fit the model for the first, simplified method
     init_alpha = 5; % Some approximation for the initial value of the constant
@@ -57,20 +45,19 @@ function X = calibrate_from_measurements(freq, volume, full_volume, glass_height
     
     objective = @(v) method_3_loss(freq, glass_height, volume, compose_method_3_v(method_3_defaults, v));
     init_vs = [init_a, init_b1, init_C, init_phi1, init_phi2];
-    user_set = init_vs(2:end);
-    init_vs = [user_set(1), user_set(isnan(method_3_defaults))];
+    init_vs(2:end) = init_vs(2:end)(isnan(method_3_defaults));
     
     method_3 = fminsearch(objective, init_vs);
     
-    X = [X, compose_method_3_v(method_3_defaults, method_3)];
+    method_3_defaults(isnan(method_3_defaults)) = method_3;
     
-    X = [X, full_volume, glass_height];
+    X = [X, method_3_defaults];
     
    
 end
 
 
 function method_3_v = compose_method_3_v(defaults, v)
-    defaults(isnan(defaults)) = v(2:end);
-    method_3_v = [v(1), defaults];
+    defaults(isnan(defaults)) = v;
+    method_3_v = defaults;
 end
