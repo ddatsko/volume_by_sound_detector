@@ -1,4 +1,13 @@
-function [dom_frequency, volume] = predict(X, freq, empty_freq, glass_volume, amp)
+function [dom_frequency, volume] = predict(X, freq, amp, empty_freq, glass_volume, glass_height)
+%         X: vector of predicted constants that may change in future.
+%         current structure (8 values): 
+%           - number of points during calibration including the 0 volume one
+%           - frequency on 0 volume
+%           - a for method 1
+%           - a, b1, C, phi1, phi2 for method 3
+
+
+
     [~, argmax] = max(amp);
     dom_frequency = freq(argmax);
     

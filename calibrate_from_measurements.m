@@ -1,4 +1,4 @@
-function X = calibrate_from_measurements(freq, volume, full_volume)
+function X = calibrate_from_measurements(freq, volume, full_volume, glass_height, method_3_defaults)
     %{
         Function for calibration from measurements.
         Produces the coefficients that will be then used in predict
@@ -11,44 +11,53 @@ function X = calibrate_from_measurements(freq, volume, full_volume)
         full_volume: full volume of the glass
         
         X: vector of predicted constants that may change in future.
-        current structure (5 values): 
+        current structure (8 values): 
           - number of points during calibration including the 0 volume one
-          - H*, c, a for the first method
-          - a for the second, simplified method
-        
+          - frequency on 0 volume
+          - a for method 1
+          - a, b1, C, phi1, phi2 for method 3
+
+        method_3_defaults:
+          - Values for method 3 calibration that should not be estimated
+          from the data but are set by defauser. If value is NaN, it will be
+          deduced during oprimization
+           - values order:
+               b1, C, phi1, phi2  (NOTE that a can not be set here)
+      
     %}
+    % Set the first element of X to number of calibration points
+    n_points = length(freq);
+    X = [n_points];
     
-    % Distance from the top of the glass in the original formulation
-    d = full_volume - volume;
     
-    % Initial values for the gradient descent
-    H_init = 1000;
-    c_init = 1;
-    a_init = 5; 
-   
-
-    % Optimize the function with respect to parameters H, a and c,
-
-    
-    % If there are at least 3 points -- just fit the function as it is
-    if length(freq) >= 3
-        objective = @(v) method_1_loss(d, freq, [v(1), v(2), v(3)]);
-        method_1 = fminsearch(objective, [H_init, c_init, a_init]);
-    else
-        % Other wise, fix c to 1 (which should be very close to the optimal one)
-        % This way, only 2 parameters have to be guessed
-        % If there are less than two points, the method will mostly give
-        % wrong results, so its result is unlikely to be good
-        objective = @(v) method_1_loss(d, freq, [v(1), 1, v(2)]);
-        fitted = fminsearch(objective, [H_init, a_init]);
-        method_1 = [fitted(1), 1, fitted(2)];
-    end
-    
-    % Fit the model for the second, simplified method
+    % Fit the model for the first, simplified method
     init_alpha = 5; % Some approximation for the initial value of the constant
     objective_2 = @(alpha) method_2_loss(volume, freq, full_volume, alpha);
     method_2 = fminsearch(objective_2, [init_alpha]);
     
-    X = [length(freq), method_1, method_2];
+    X = [X, method_2];
+    
+    init_a = 0.1;
+    init_b1 = 1;
+    init_C = 5;
+    init_phi1 = 0.1;
+    init_phi2 = 0.1;
+    
+    objective = @(v) method_3_loss(freq, glass_height, volume, compose_method_3_v(method_3_defaults, v));
+    init_vs = [init_a, init_b1, init_C, init_phi1, init_phi2];
+    init_vs = init_vs(isnan(method_3_defaults));
+    
+    method_3 = fminsearch(objective, init_vs);
+    
+    method_3_defaults(isnan(method_3_defaults)) = method_3;
+    
+    X = [X, method_3_defaults];
+    
    
+end
+
+
+function method_3_v = compose_method_3_v(defaults, v)
+    defaults(isnan(defaults)) = v;
+    method_3_v = defaults;
 end
