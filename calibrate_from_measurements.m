@@ -52,8 +52,8 @@ function X = calibrate_from_measurements(freq, volume, full_volume, glass_height
     init_a = 0.1;
     init_b1 = 1;
     init_C = 5;
-    init_phi1 = 0.1;
-    init_phi2 = 0.1;
+    init_phi1 = 0;
+    init_phi2 = 0;
     
     objective = @(v) method_3_loss(freq, glass_height, volume, compose_method_3_v(method_3_defaults, v));
     init_vs = [init_a, init_b1, init_C, init_phi1, init_phi2];
