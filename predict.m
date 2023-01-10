@@ -1,10 +1,15 @@
 function [dom_frequency, method_2_volume, method_3_volume] = predict(X, freq, amp)
-%         X: vector of predicted constants that may change in future.
-%         current structure (8 values): 
-%           - number of points during calibration including the 0 volume one
-%           - frequency on 0 volume
-%           - a for method 1
-%           - a, b1, C, phi1, phi2 for method 3
+    %{
+        Predict liquid volume 
+        freq: vector of frequency axis after FFT
+        amp: vector of amplitudes corresponding to eqch frequency from freq 
+        X: vector of predicted constants that may change in future.
+        current structure (8 values): 
+          - number of points during calibration including the 0 volume one
+          - frequency on 0 volume
+          - a for method 1
+          - a, b1, C, phi1, phi2 for method 3
+    %}
 
 
 
@@ -31,13 +36,10 @@ function [dom_frequency, method_2_volume, method_3_volume] = predict(X, freq, am
             
     nu = (empty_freq / dom_frequency) .^2;
 
-    
     alpha_2 = X(3);
     
     method_2_volume = glass_volume * ((nu - 1) / alpha_2)^0.25;
     method_3_v = X(4:8);
     method_3_volume = method_3_predict(dom_frequency, empty_freq, glass_height, method_3_v);
-    
-
     
 end

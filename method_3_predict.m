@@ -1,4 +1,13 @@
 function volume = method_3_predict(freq, empty_freq, glass_height, v)
+    %{
+        Liquid volume prediction by method 3
+        freq: glass frequency to predict for
+        empty_freq: frequency of the empty glass
+        glass_height: physical height of the glass
+        v: vector of fitted parameters after calibration
+    %}
+
+
     a = v(1);
     b1 = v(2);
     C = v(3);

@@ -29,18 +29,15 @@ function X = calibrate_from_measurements(freq, volume, full_volume, glass_height
     %}
     % Set the first element of X to number of calibration points
     
-    % TODO: Sor freq and volume by frequency before doing this!!!
+    % Sort poitns by volume
+    tmp = [volume; freq];
+    tmp = sortrows(tmp.',1).';
+    volume = tmp(1, :);
+    freq = tmp(2, :);
+    
     n_points = length(freq);
     X = [n_points, freq(1)];
     
-    disp("Calibrating from measurements: ");
-    disp(freq);
-    disp(volume);
-    
-    
-    disp("Calibration: ");
-    disp(freq);
-    disp(volume);
     
     % Fit the model for the first, simplified method
     init_alpha = 5; % Some approximation for the initial value of the constant
@@ -52,15 +49,16 @@ function X = calibrate_from_measurements(freq, volume, full_volume, glass_height
     init_a = 0.1;
     init_b1 = 1;
     init_C = 5;
-    init_phi1 = 0;
-    init_phi2 = 0;
+    init_phi1 = 0.1;
+    init_phi2 = 0.1;
     
     objective = @(v) method_3_loss(freq, glass_height, volume, compose_method_3_v(method_3_defaults, v));
     init_vs = [init_a, init_b1, init_C, init_phi1, init_phi2];
     user_set = init_vs(2:end);
     init_vs = [user_set(1), user_set(isnan(method_3_defaults))];
     
-    method_3 = fminsearch(objective, init_vs);
+    options = optimset('MaxFunEvals', 100000);
+    method_3 = fminsearch(objective, init_vs, options);
     
     X = [X, compose_method_3_v(method_3_defaults, method_3)];
     

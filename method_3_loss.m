@@ -1,4 +1,13 @@
 function loss = method_3_loss(freq, glass_height, volumes, v)
+    %{
+        Loss function of method 3
+        - freq: vector of real glass frequencies starting with frequency of
+        empty glass
+        - glass_height: physical height of the glass
+        - volumes: vectpr of real volumes coresponding to freq
+        - v: constants after calibration
+    %}
+
     % v: a, b1, C, phi1, phi2
     % If the amount of points is too small for fitting, should use some
     % default values outside of this function. 
