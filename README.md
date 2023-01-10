@@ -1,4 +1,4 @@
-# GUI applocation for liquid volume measurement in a glass
+# GUI applocation for liquid volume measurement in a glass by its sound
 This is a MATLAB implementation of a GUI application that allows loquid volume estimation by sound in real time
 
 ## IMPORTANT NOTE
